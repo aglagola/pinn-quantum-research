@@ -164,6 +164,16 @@ python experiments/run_week3_uq_and_benchmarks.py
 python experiments/compare_loss_weighting.py
 ```
 
+### 4. Launch Interactive Web Dashboard
+
+Launch the Streamlit web application to interactively configure potentials, run live training, and explore solutions:
+
+```bash
+streamlit run app.py
+```
+
+*Or open [`docs/pinn_explorer.html`](docs/pinn_explorer.html) in any web browser for a zero-server standalone visualizer.*
+
 Generated publication figures are automatically saved to `results/`.
 
 ---

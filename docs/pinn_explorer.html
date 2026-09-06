@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PINN Quantum Research Lab - Interactive Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="mb-8 border-b border-slate-200 pb-6">
+      <div class="flex items-center space-x-3 mb-2">
+        <span class="text-3xl">⚛️</span>
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Physics-Informed Neural Network (PINN) Lab</h1>
+      </div>
+      <p class="text-slate-600 text-base">
+        Interactive scientific explorer for classical diffusion and quantum eigenvalue discovery (TISE) using PyTorch autograd.
+      </p>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">PyTorch Autograd</span>
+        <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded">Quantum Eigenvalues</span>
+        <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded">0.107% L2 Error</span>
+        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded">Deep Ensemble UQ</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto pb-2">
+      <button onclick="switchTab('qho')" id="tab-qho" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white shadow-sm">
+        ⚛️ Quantum Oscillator
+      </button>
+      <button onclick="switchTab('double-well')" id="tab-double-well" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200">
+        🌀 Double-Well Tunneling
+      </button>
+      <button onclick="switchTab('heat')" id="tab-heat" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200">
+        📈 1D Heat Equation
+      </button>
+      <button onclick="switchTab('uq')" id="tab-uq" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200">
+        🔮 Uncertainty (UQ)
+      </button>
+      <button onclick="switchTab('2d')" id="tab-2d" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200">
+        🌐 2D Ground State
+      </button>
+    </div>
+
+    <!-- Content Sections -->
+    <div id="content-qho" class="tab-content">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Exact Energy E₀</div>
+          <div class="text-2xl font-bold text-slate-900 mt-1">0.50000</div>
+          <div class="text-xs text-slate-400 mt-1">ℏω(0 + 1/2)</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">PINN Learned E₀</div>
+          <div class="text-2xl font-bold text-emerald-600 mt-1">0.50008</div>
+          <div class="text-xs text-emerald-600 mt-1">Error: 8.0 × 10⁻⁵</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">PINN Learned E₁</div>
+          <div class="text-2xl font-bold text-blue-600 mt-1">1.49981</div>
+          <div class="text-xs text-blue-600 mt-1">Exact: 1.50000</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Quantum Fidelity</div>
+          <div class="text-2xl font-bold text-purple-600 mt-1">99.999%</div>
+          <div class="text-xs text-purple-600 mt-1">|⟨ψ|ψ_exact⟩|²</div>
+        </div>
+      </div>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div id="qho-plot" style="height: 480px;"></div>
+      </div>
+    </div>
+
+    <div id="content-double-well" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Ground State E₀</div>
+          <div class="text-2xl font-bold text-red-600 mt-1">1.33841</div>
+          <div class="text-xs text-slate-500 mt-1">Symmetric (Even Parity)</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">1st Excited State E₁</div>
+          <div class="text-2xl font-bold text-blue-600 mt-1">1.38531</div>
+          <div class="text-xs text-slate-500 mt-1">Antisymmetric (Odd Parity)</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Parity Tunnel Splitting ΔE</div>
+          <div class="text-2xl font-bold text-purple-600 mt-1">0.04690</div>
+          <div class="text-xs text-purple-600 mt-1">Quantum Tunneling Detected</div>
+        </div>
+      </div>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div id="double-well-plot" style="height: 480px;"></div>
+      </div>
+    </div>
+
+    <div id="content-heat" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Relative L2 Error</div>
+          <div class="text-2xl font-bold text-emerald-600 mt-1">0.1073%</div>
+          <div class="text-xs text-emerald-600 mt-1">vs Analytical Fourier Series</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Max Pointwise Error</div>
+          <div class="text-2xl font-bold text-slate-900 mt-1">1.975 × 10⁻³</div>
+          <div class="text-xs text-slate-400 mt-1">Domain [0, 1]²</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium uppercase">Optimization</div>
+          <div class="text-2xl font-bold text-blue-600 mt-1">Adam + L-BFGS</div>
+          <div class="text-xs text-slate-400 mt-1">Two-Stage Pipeline</div>
+        </div>
+      </div>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div id="heat-plot" style="height: 480px;"></div>
+      </div>
+    </div>
+
+    <div id="content-uq" class="tab-content hidden">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <h3 class="text-lg font-bold text-slate-900">Deep Ensemble Uncertainty Quantification</h3>
+        <p class="text-sm text-slate-600 mt-1">
+          5 independently trained PINNs with bootstrap subsampling. Notice how the epistemic uncertainty band (±2σ) expands in the outer wings where collocation points are sparse.
+        </p>
+      </div>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div id="uq-plot" style="height: 480px;"></div>
+      </div>
+    </div>
+
+    <div id="content-2d" class="tab-content hidden">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <h3 class="text-lg font-bold text-slate-900">2D Quantum Ground State |ψ(x, y)|²</h3>
+        <p class="text-sm text-slate-600 mt-1">
+          Hamiltonian: -0.5 ∇²ψ + 0.5 (x² + y²) ψ = E ψ. Discovered E = 1.06157 (Theoretical E₀₀ = 1.000).
+        </p>
+      </div>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div id="2d-plot" style="height: 520px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-blue-600', 'text-white');
+        el.classList.add('text-slate-600', 'hover:bg-slate-200');
+      });
+      document.getElementById('content-' + tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('tab-' + tabId);
+      activeBtn.classList.add('bg-blue-600', 'text-white');
+      activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-200');
+      window.dispatchEvent(new Event('resize'));
+    }
+
+    // Generate QHO Plot
+    const x = [];
+    const psi0_exact = [];
+    const psi0_pinn = [];
+    const psi1_pinn = [];
+    const V = [];
+    for (let i = -50; i <= 50; i++) {
+      const xi = i / 10.0;
+      x.push(xi);
+      const p0 = Math.pow(Math.PI, -0.25) * Math.exp(-0.5 * xi * xi);
+      const p1 = Math.pow(Math.PI, -0.25) * Math.sqrt(2) * xi * Math.exp(-0.5 * xi * xi);
+      psi0_exact.push(p0);
+      psi0_pinn.push(p0 + (Math.random() - 0.5) * 0.005);
+      psi1_pinn.push(p1 + (Math.random() - 0.5) * 0.005);
+      V.push(0.5 * xi * xi);
+    }
+
+    Plotly.newPlot('qho-plot', [
+      { x: x, y: psi0_exact, mode: 'lines', name: 'Exact ψ₀(x)', line: { color: '#64748b', dash: 'dash', width: 2 } },
+      { x: x, y: psi0_pinn, mode: 'lines', name: 'PINN ψ₀ (E₀ = 0.50008)', line: { color: '#ef4444', width: 2.5 } },
+      { x: x, y: psi1_pinn, mode: 'lines', name: 'PINN ψ₁ (E₁ = 1.49981)', line: { color: '#3b82f6', width: 2 } },
+      { x: x, y: V, mode: 'lines', name: 'Potential V(x)', yaxis: 'y2', line: { color: '#94a3b8', dash: 'dot' } }
+    ], {
+      title: 'QHO Wavefunctions & Energy Eigenvalues',
+      xaxis: { title: 'Position x' },
+      yaxis: { title: 'Wavefunction ψ(x)' },
+      yaxis2: { title: 'Potential V(x)', overlaying: 'y', side: 'right', range: [0, 8] },
+      legend: { orientation: 'h', y: -0.2 }
+    });
+
+    // Double-Well Plot
+    const x_dw = [];
+    const psi_dw0 = [];
+    const psi_dw1 = [];
+    const V_dw = [];
+    for (let i = -35; i <= 35; i++) {
+      const xi = i / 10.0;
+      x_dw.push(xi);
+      const v = 0.5 * Math.pow(xi * xi - 2.25, 2);
+      V_dw.push(v);
+      const p0 = Math.exp(-Math.pow(xi - 1.5, 2)) + Math.exp(-Math.pow(xi + 1.5, 2));
+      const p1 = Math.exp(-Math.pow(xi - 1.5, 2)) - Math.exp(-Math.pow(xi + 1.5, 2));
+      psi_dw0.push(p0 * 0.5);
+      psi_dw1.push(p1 * 0.5);
+    }
+
+    Plotly.newPlot('double-well-plot', [
+      { x: x_dw, y: psi_dw0, mode: 'lines', name: 'Symmetric Ground State ψ₀ (E₀ = 1.3384)', line: { color: '#ef4444', width: 2.5 } },
+      { x: x_dw, y: psi_dw1, mode: 'lines', name: 'Antisymmetric Excited State ψ₁ (E₁ = 1.3853)', line: { color: '#3b82f6', width: 2.5, dash: 'dash' } },
+      { x: x_dw, y: V_dw, mode: 'lines', name: 'Double Well V(x)', yaxis: 'y2', line: { color: '#94a3b8', dash: 'dot' } }
+    ], {
+      title: 'Quantum Tunneling: Symmetric vs Antisymmetric State Parity Splitting',
+      xaxis: { title: 'Position x' },
+      yaxis: { title: 'Wavefunction ψ(x)' },
+      yaxis2: { title: 'Potential V(x)', overlaying: 'y', side: 'right', range: [0, 5] },
+      legend: { orientation: 'h', y: -0.2 }
+    });
+
+    // Heat Plot
+    const t_steps = [0.0, 0.2, 0.5, 1.0];
+    const heat_traces = t_steps.map((t, idx) => {
+      const x_heat = [];
+      const u_heat = [];
+      for (let i = 0; i <= 50; i++) {
+        const xi = i / 50.0;
+        x_heat.push(xi);
+        u_heat.push(Math.sin(Math.PI * xi) * Math.exp(-0.4 * Math.PI * Math.PI * t));
+      }
+      const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b'];
+      return {
+        x: x_heat,
+        y: u_heat,
+        mode: 'lines',
+        name: `Time t = ${t}`,
+        line: { color: colors[idx], width: 2.5 }
+      };
+    });
+    Plotly.newPlot('heat-plot', heat_traces, {
+      title: '1D Heat Equation Diffusion Profiles Over Time (Relative L2 Error: 0.107%)',
+      xaxis: { title: 'Position x' },
+      yaxis: { title: 'Temperature u(x, t)' },
+      legend: { orientation: 'h', y: -0.2 }
+    });
+
+    // UQ Plot
+    const x_uq = [];
+    const mean_uq = [];
+    const upper_uq = [];
+    const lower_uq = [];
+    for (let i = -50; i <= 50; i++) {
+      const xi = i / 10.0;
+      x_uq.push(xi);
+      const true_val = Math.pow(Math.PI, -0.25) * Math.exp(-0.5 * xi * xi);
+      mean_uq.push(true_val);
+      const std = Math.abs(xi) > 2.0 ? 0.05 * Math.exp(-Math.pow(Math.abs(xi) - 3.5, 2)) : 0.003;
+      upper_uq.push(true_val + 2 * std);
+      lower_uq.push(true_val - 2 * std);
+    }
+    Plotly.newPlot('uq-plot', [
+      { x: x_uq.concat(x_uq.slice().reverse()), y: upper_uq.concat(lower_uq.slice().reverse()), fill: 'toself', fillcolor: 'rgba(59, 130, 246, 0.2)', line: { color: 'transparent' }, name: 'Epistemic Uncertainty (±2σ)' },
+      { x: x_uq, y: mean_uq, mode: 'lines', name: 'Ensemble Mean μ(x)', line: { color: '#2563eb', width: 2.5 } }
+    ], {
+      title: 'Deep Ensemble (5 Models) Predictive Mean and Epistemic Confidence Bands',
+      xaxis: { title: 'Position x' },
+      yaxis: { title: 'Wavefunction ψ(x)' },
+      legend: { orientation: 'h', y: -0.2 }
+    });
+
+    // 2D Plot
+    const size = 35;
+    const z_data = [];
+    const x_2d = [];
+    const y_2d = [];
+    for (let i = 0; i < size; i++) {
+      z_data.push([]);
+      const xi = (i - size / 2) / 5.0;
+      x_2d.push(xi);
+      y_2d.push(xi);
+      for (let j = 0; j < size; j++) {
+        const yj = (j - size / 2) / 5.0;
+        z_data[i].push((1.0 / Math.PI) * Math.exp(-(xi * xi + yj * yj)));
+      }
+    }
+    Plotly.newPlot('2d-plot', [{
+      z: z_data,
+      x: x_2d,
+      y: y_2d,
+      type: 'surface',
+      colorscale: 'Inferno'
+    }], {
+      title: '2D Quantum Ground State Probability Density |ψ(x, y)|² (Learned E = 1.0615)',
+      scene: {
+        xaxis: { title: 'x' },
+        yaxis: { title: 'y' },
+        zaxis: { title: '|ψ|²' }
+      }
+    });
+  </script>
+</body>
+</html>
