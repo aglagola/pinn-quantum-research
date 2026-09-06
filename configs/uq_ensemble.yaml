@@ -1,0 +1,17 @@
+# Config for Week 3: Uncertainty Quantification via Deep Ensembles
+uq:
+  method: "deep_ensemble"
+  num_models: 5
+
+physics:
+  system: "harmonic_oscillator"
+  x_range: [-5.0, 5.0]
+
+training:
+  n_collocation: 800
+  epochs_adam: 1500
+  epochs_lbfgs: 200
+  lr_adam: 0.001
+
+output_dir: "results/week3_uq"
+

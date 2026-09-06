@@ -1,0 +1,21 @@
+[project]
+name = "pinn-quantum-research"
+version = "0.1.0"
+description = "A research-grade Physics-Informed Neural Network (PINN) framework for classical PDEs, quantum eigenvalue discovery (TISE), and uncertainty quantification in PyTorch."
+authors = [{ name = "Adam Glagola" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.65.0",
+    "pytest>=7.4.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+

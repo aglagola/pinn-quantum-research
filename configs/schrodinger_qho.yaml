@@ -1,0 +1,36 @@
+# Config for Week 2: 1D Quantum Harmonic Oscillator TISE
+physics:
+  system: "harmonic_oscillator"
+  omega: 1.0
+  m: 1.0
+  hbar: 1.0
+  x_range: [-5.0, 5.0]
+
+states_to_solve:
+  - index: 0
+    name: "Ground State"
+    E_init: 0.6
+    expected_E: 0.5
+  - index: 1
+    name: "First Excited State"
+    E_init: 1.6
+    expected_E: 1.5
+
+network:
+  hidden_dims: [64, 64, 64]
+  activation: "tanh"
+  ansatz_type: "gaussian"
+
+training:
+  n_collocation: 1200
+  n_dense: 600
+  epochs_adam: 2000
+  epochs_lbfgs: 300
+  lr_adam: 0.001
+  loss_weights:
+    w_pde: 1.0
+    w_norm: 10.0
+    w_ortho: 25.0
+
+output_dir: "results/week2_qho"
+

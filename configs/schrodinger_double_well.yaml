@@ -1,0 +1,33 @@
+# Config for Week 2: 1D Double-Well Potential (Quantum Tunneling & Parity Splitting)
+physics:
+  system: "double_well"
+  a: 1.5
+  lam: 0.5
+  x_range: [-3.5, 3.5]
+
+states_to_solve:
+  - index: 0
+    name: "Symmetric Ground State"
+    E_init: 0.8
+  - index: 1
+    name: "Antisymmetric First Excited State"
+    E_init: 1.2
+
+network:
+  hidden_dims: [64, 64, 64]
+  activation: "tanh"
+  ansatz_type: "none" # Use boundary penalty or broad domain
+
+training:
+  n_collocation: 1500
+  n_dense: 600
+  epochs_adam: 2500
+  epochs_lbfgs: 400
+  lr_adam: 0.001
+  loss_weights:
+    w_pde: 1.0
+    w_norm: 15.0
+    w_ortho: 30.0
+
+output_dir: "results/week2_double_well"
+

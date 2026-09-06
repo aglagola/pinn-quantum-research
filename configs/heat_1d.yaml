@@ -1,0 +1,28 @@
+# Config for Week 1: 1D Heat Equation PINN
+pde:
+  alpha: 0.4
+  L: 1.0
+  T: 1.0
+  k: 1
+
+network:
+  in_dim: 2
+  out_dim: 1
+  hidden_dims: [64, 64, 64]
+  activation: "tanh"
+  use_fourier_features: false
+
+training:
+  n_collocation: 2500
+  n_initial: 250
+  n_boundary: 250
+  epochs_adam: 2500
+  lr_adam: 0.001
+  epochs_lbfgs: 400
+  weights:
+    residual: 1.0
+    initial: 20.0
+    boundary: 20.0
+
+output_dir: "results/week1_heat"
+
